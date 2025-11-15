@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The RealBurn Method</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      /* Solid blue background */
+      background: #0d6efd;
+      color: #f9fafb;
+    }
+
+    .wrapper {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    h1 {
+      margin-bottom: 0.25rem;
+    }
+
+    h2 {
+      margin-top: 1.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .card {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 1rem 1.25rem;
+      margin-top: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 0.6rem;
+      margin-bottom: 0.15rem;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.4rem 0.5rem;
+      border-radius: 0.5rem;
+      border: 1px solid rgba(15, 23, 42, 0.7);
+      background: rgba(255, 255, 255, 0.95);
+      color: #111827;
+      font-size: 0.95rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #111827;
+      box-shadow: 0 0 0 1px rgba(17, 24, 39, 0.4);
+    }
+
+    button {
+      margin-top: 0.8rem;
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #111827;
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .result {
+      margin-top: 0.75rem;
+      padding: 0.6rem 0.8rem;
+      border-radius: 0.5rem;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(15, 23, 42, 0.6);
+      font-size: 0.95rem;
+      color: #e5e7eb;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      opacity: 0.85;
+      margin-top: 0.4rem;
+    }
+
+    .formula {
+      font-family: Menlo, Consolas, monospace;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.6rem;
+      background: rgba(15, 23, 42, 0.85);
+      border-radius: 0.5rem;
+      border: 1px solid rgba(15, 23, 42, 0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>The RealBurn Method</h1>
+    <p style="text-align:center;font-size:0.9rem;">
+      Use your Fitbit calories burned plus your BMR to calculate a smart dinner calorie budget.
+    </p>
+
+    <!-- BMR CALCULATOR -->
+    <div class="card" id="bmr">
+      <h2>BMR CALCULATOR</h2>
+
+      <label for="sex">Sex (enter "m" for male, "f" for female):</label>
+      <input id="sex" type="text" placeholder="m or f" />
+
+      <label for="age">Age (years):</label>
+      <input id="age" type="number" />
+
+      <label for="height">Height (inches):</label>
+      <input id="height" type="number" />
+
+      <label for="weight">Weight (lbs):</label>
+      <input id="weight" type="number" />
+
+      <button onclick="calcBMR()">Calculate BMR</button>
+      <div id="bmrResult" class="result" style="display:none;"></div>
+
+      <p class="note">
+        This uses the Mifflin–St Jeor equation. It is an estimate, not medical advice.
+      </p>
+    </div>
+
+    <!-- REALBURN DINNER CALCULATOR -->
+    <div class="card" id="realburn">
+      <h2>REALBURN DINNER CALCULATOR</h2>
+
+      <p style="font-size:0.9rem;">
+        Use your Fitbit “Calories burned” number (TDEE so far today), your BMR, hours until bed,
+        and what you have eaten so far to get your RealBurn dinner number.
+      </p>
+
+      <label for="tdee">TDEE so far today (Fitbit calories burned):</label>
+      <input id="tdee" type="number" />
+
+      <label for="bmrValue">Your BMR (from the BMR calculator above):</label>
+      <input id="bmrValue" type="number" />
+
+      <label for="hoursLeft">Hours until bedtime:</label>
+      <input id="hoursLeft" type="number" />
+
+      <label for="blcals">Breakfast + Lunch calories eaten so far:</label>
+      <input id="blcals" type="number" />
+
+      <button onclick="calcRealBurn()">Calculate Dinner Calories</button>
+      <div id="realburnResult" class="result" style="display:none;"></div>
+
+      <div class="formula">
+        Dinner ≈ TDEE so far today + (BMR ÷ 24 × hours until bed)
+        − (breakfast + lunch) − 500
+      </div>
+      <p class="note">
+        The “500” is the built-in daily deficit, aiming for roughly one pound of fat loss per week
+        (3500 calories).
+      </p>
+    </div>
+  </div>
+
+  <script>
+    function calcBMR() {
+      const sexRaw = document.getElementById("sex").value.trim().toLowerCase();
+      const age = parseFloat(document.getElementById("age").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const weight = parseFloat(document.getElementById("weight").value);
+
+      if (!sexRaw || isNaN(age) || isNaN(height) || isNaN(weight)) {
+        alert("Please fill in sex, age, height, and weight.");
+        return;
+      }
+
+      const kg = weight * 0.453592;
+      const cm = height * 2.54;
+
+      let bmr;
+      if (sexRaw === "m") {
+        bmr = (10 * kg) + (6.25 * cm) - (5 * age) + 5;
+      } else {
+        // default to female if not 'm'
+        bmr = (10 * kg) + (6.25 * cm) - (5 * age) - 161;
+      }
+
+      const resultDiv = document.getElementById("bmrResult");
+      resultDiv.style.display = "block";
+      resultDiv.textContent = "Your BMR is: " + Math.round(bmr) + " calories/day.";
+    }
+
+    function calcRealBurn() {
+      const tdee = parseFloat(document.getElementById("tdee").value);
+      const bmr = parseFloat(document.getElementById("bmrValue").value);
+      const hours = parseFloat(document.getElementById("hoursLeft").value);
+      const bl = parseFloat(document.getElementById("blcals").value);
+
+      if (isNaN(tdee) || isNaN(bmr) || isNaN(hours) || isNaN(bl)) {
+        alert("Please fill in all the RealBurn fields.");
+        return;
+      }
+
+      const hourlyBMR = bmr / 24;
+      const remainingBurn = hourlyBMR * hours;
+
+      // RealBurn formula:
+      // dinner = tdee + remainingBurn - bl - 500
+      let dinner = tdee + remainingBurn - bl - 500;
+
+      const resultDiv = document.getElementById("realburnResult");
+      resultDiv.style.display = "block";
+
+      if (dinner < 0) {
+        dinner = 0;
+        resultDiv.textContent =
+          "Your RealBurn dinner calorie budget today is: 0 calories. " +
+          "You have already used today’s budget based on these inputs.";
+      } else {
+        resultDiv.textContent =
+          "Your RealBurn dinner calorie budget today is: " +
+          Math.round(dinner) + " calories.";
+      }
+    }
+  </script>
+</body>
+</html>
