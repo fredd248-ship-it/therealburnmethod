@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+   <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -18,7 +19,7 @@
     .wrapper {
       max-width: 800px;
       margin: 0 auto;
-      padding: 1.5rem;
+      padding: 2.25rem 1.5rem 1.5rem; /* extra top space */
     }
 
     h1, h2 {
@@ -112,14 +113,59 @@
       border-radius: 0.5rem;
       border: 1px solid rgba(15, 23, 42, 0.6);
     }
+
+    /* BUY BUTTON */
+    .buy-wrap {
+      text-align: center;
+      margin-top: 1.25rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .buy-button {
+      display: inline-block;
+      background: #ffd166;
+      color: #111827;
+      text-decoration: none;
+      font-weight: 700;
+      padding: 0.7rem 1.25rem;
+      border-radius: 999px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+      transition: transform 0.1s ease, filter 0.1s ease;
+      font-size: 1rem;
+    }
+
+    .buy-button:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
+    }
+
+    .buy-subtext {
+      font-size: 0.85rem;
+      opacity: 0.9;
+      margin-top: 0.5rem;
+    }
   </style>
 </head>
+
 <body>
   <div class="wrapper">
     <h1>The RealBurn Method</h1>
     <p style="text-align:center;font-size:0.9rem;">
       Use your Fitbit calories burned plus your BMR to calculate a smart dinner calorie budget.
     </p>
+
+    <!-- BUY THE BOOK BUTTON -->
+    <div class="buy-wrap">
+      <a class="buy-button"
+         href="https://www.amazon.com/dp/B0G38VTM6X"
+         target="_blank"
+         rel="noopener noreferrer">
+        Buy the Book
+      </a>
+      <div class="buy-subtext">
+        Paperback and Kindle available
+      </div>
+    </div>
 
     <!-- BMR CALCULATOR -->
     <div class="card" id="bmr">
